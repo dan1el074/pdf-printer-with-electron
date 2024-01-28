@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="top-bar.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header class="chrome-bar">
+      <div class="descriptions">
+        <img src="./images/icon.svg" />
+        <span>Imprime Arquivos</span>
+      </div>
+      <div class="tab-bar">
+        <div class="window-buttons">
+          <div class="minimise">
+            <button id="btnMinimize">
+              <img
+                src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/199011/windows-minimise.png"
+              />
+            </button>
+          </div>
+          <div class="close">
+            <button id="btnClose">
+              <img
+                src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/199011/windows-close.png"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="home">
+      <p>Selecione o arquivo Excel:</p>
+      <div class="input-search">
+        <button id="search-btn" class="btn">Procurar</button>
+        <span id="placeholder">Nenhum arquivo selecionado</span>
+        <span id="new-placeholder">projetos.xlxs</span>
+      </div>
+
+      <button id="next-btn" class="btn next">Next ></button>
+    </section>
+
+    <section class="action-page">
+      <button id="previous-btn" class="btn previous">< Volvar</button>
+      <h1>Ma oiiii</h1>
+    </section>
+
+    <script src="./js/script.js"></script>
+    <script src="./js/window.js"></script>
+    <script src="./js/style.js"></script>
+  </body>
+</html>
