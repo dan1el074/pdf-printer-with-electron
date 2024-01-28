@@ -1,11 +1,17 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
+const { exec } = require("child_process");
 const path = require("path");
-let data = {};
+const { deprecate } = require("util");
 
-let mainWindow = null;
+let window = null;
+let data = {
+  folder: "",
+  fileName: "",
+  printers: [],
+};
 
 async function createWindow() {
-  mainWindow = new BrowserWindow({
+  window = new BrowserWindow({
     icon: path.join(__dirname, "/icon.ico"),
     width: 500,
     height: 300,
@@ -19,10 +25,9 @@ async function createWindow() {
     },
   });
 
-  await mainWindow.loadFile("./src/pages/index.html");
-
-  mainWindow.webContents.send("set-printers", printers);
-  // mainWindow.webContents.openDevTools();
+  await window.loadFile("./src/pages/index.html");
+  // window.webContents.openDevTools();
+  getPrinters("wmic printer get name");
 }
 
 app.whenReady().then(createWindow);
@@ -37,17 +42,30 @@ ipcMain.on("set-teste", (event, data) => {
   console.log(data);
 });
 
-// TODO: recuperar impressoras
-const printers = [
-  {
-    name: "Samsung 4080",
-    formatos: ["Carta", "A4"],
-  },
-  {
-    name: "fax",
-    formatos: ["fax"],
-  },
-];
+// recupera impressoras
+function getPrinters(command) {
+  exec(command, (error, stdout, stderr) => {
+    if (error || stderr) {
+      return;
+    }
+
+    let res = String(stdout).trim();
+    printers = res.split(/\r?\n/g);
+
+    for (i = 0; i < printers.length; i++) {
+      printers[i] = printers[i].replace("\\r", "").trim();
+    }
+
+    let printerIndex = printers.indexOf("Name");
+    if (printerIndex != -1) {
+      printers.splice(printerIndex, 1);
+    }
+
+    data.printers = printers;
+    console.log(printers);
+    window.webContents.send("set/printers", printers);
+  });
+}
 
 // recuperar pasta
 ipcMain.on("action/showDialog", () => {
@@ -68,12 +86,13 @@ async function getFolder() {
   const fileName = arrayFolder[arrayFolder.length - 1];
 
   data.folder = folder;
-  mainWindow.webContents.send("set/fileName", fileName);
+  data.fileName = fileName;
+  window.webContents.send("set/fileName", fileName);
 }
 
 // comandos dos botões da janela
 ipcMain.on("app/minimize", () => {
-  mainWindow.minimize();
+  window.minimize();
 });
 
 ipcMain.on("app/close", () => {

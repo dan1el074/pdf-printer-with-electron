@@ -59,13 +59,13 @@ section .btn:hover {
   transition: 0.3s;
 }
 
-section .btn.next {
+section .btn.btn-next {
   position: absolute;
   bottom: 30px;
   right: 30px;
 }
 
-section .btn.previous {
+section .btn.btn-previous {
   position: absolute;
   top: 60px;
   left: 30px;
@@ -81,6 +81,7 @@ section.home .input-search {
   align-items: baseline;
   padding: 10px 18px;
   background-color: #fff;
+  border: 2px solid #fff;
   border-radius: 4px;
   max-width: 400px;
   max-height: 51px;
@@ -107,7 +108,40 @@ section.action-page {
   background-color: #eee;
 }
 
-section.action-page.active {
-  transform: translateX(-100%);
-  transition: 0.5s;
+section.action-page label {
+  margin-top: 60px;
+}
+
+section.action-page .printer-input {
+  padding: 10px 18px;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid rgb(233, 233, 233);
+  width: 300px;
+  height: 45px;
+  margin: 15px 0;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+section.action-page .printer-input {
+  outline: 0;
+}
+
+@keyframes shake-horizontal {
+  0%,
+  100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    -webkit-transform: translateX(-10px);
+    transform: translateX(-10px);
+  }
+  40%,
+  80% {
+    -webkit-transform: translateX(10px);
+    transform: translateX(10px);
+  }
 }
