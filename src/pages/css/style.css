@@ -113,22 +113,23 @@ section.action-page label {
 }
 
 section.action-page .printer-input {
-  padding: 10px 18px;
+  padding: 5px 18px;
   background-color: #fff;
   border-radius: 4px;
   border: 1px solid rgb(233, 233, 233);
   width: 300px;
-  height: 45px;
+  height: 35px;
   margin: 15px 0;
   overflow: hidden;
   cursor: pointer;
+  text-align: center;
 }
 
 section.action-page .printer-input {
   outline: 0;
 }
 
-@keyframes shake-horizontal {
+@keyframes shake {
   0%,
   100% {
     -webkit-transform: translateX(0);

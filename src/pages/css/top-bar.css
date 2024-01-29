@@ -71,6 +71,10 @@
   transition: 0s;
 }
 
+.chrome-bar .tab-bar .window-buttons div #btnMinimize {
+  outline: 0 !important;
+}
+
 .chrome-bar .tab-bar .window-buttons > div button {
   background-color: transparent;
   border: none;
