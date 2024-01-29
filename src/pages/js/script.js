@@ -5,6 +5,22 @@ const placeholder = document.getElementById("placeholder");
 const newPlaceholder = document.getElementById("new-placeholder");
 const printersSelect = document.getElementById("printers");
 const inputSearch = document.querySelector(".input-search");
+let showDialog = false;
+
+// mandando att pro backend
+searchBtn.addEventListener("click", () => {
+  if (!showDialog) {
+    ipcRenderer.send("action/showDialog");
+    showDialog = true;
+  }
+});
+
+inputSearch.addEventListener("click", () => {
+  if (!showDialog) {
+    ipcRenderer.send("action/showDialog");
+    showDialog = true;
+  }
+});
 
 // recebendo att do backend
 ipcRenderer.on("set/printers", (event, data) => {
@@ -18,18 +34,9 @@ ipcRenderer.on("set/fileName", (event, data) => {
   inputSearch.setAttribute("style", "border:2px solid #fff;transition:0.5s");
   newPlaceholder.setAttribute("style", "display:inline;");
   newPlaceholder.innerHTML = data;
+  showDialog = false;
 });
 
-// mandando att para backend
-function eventEmitter() {
-  const infomacaoFormulario = "Nova informação de teste.";
-  ipcRenderer.send("set-teste", infomacaoFormulario);
-}
-
-searchBtn.addEventListener("click", () => {
-  ipcRenderer.send("action/showDialog");
-});
-
-inputSearch.addEventListener("click", () => {
-  ipcRenderer.send("action/showDialog");
+ipcRenderer.on("notShow/dialog", () => {
+  showDialog = false;
 });
