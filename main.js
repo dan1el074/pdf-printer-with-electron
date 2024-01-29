@@ -1,24 +1,26 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
 const path = require("path");
-const { deprecate } = require("util");
 
 let window = null;
 let data = {
   folder: "",
   fileName: "",
   printers: [],
+  printer: "",
 };
+
+app.whenReady().then(createWindow);
 
 async function createWindow() {
   window = new BrowserWindow({
     icon: path.join(__dirname, "/icon.ico"),
     width: 500,
     height: 300,
-    maxWidth: 700,
-    maxHeight: 580,
-    frame: false,
+    maxWidth: 500,
+    maxHeight: 300,
     resizable: false,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -30,17 +32,19 @@ async function createWindow() {
   getPrinters("wmic printer get name");
 }
 
-app.whenReady().then(createWindow);
+// comandos dos botões da janela
+ipcMain.on("app/minimize", () => {
+  window.minimize();
+});
+
+ipcMain.on("app/close", () => {
+  app.quit();
+});
 
 // menu bar
 const menuTemplate = [];
 const menu = new Menu.buildFromTemplate(menuTemplate);
 Menu.setApplicationMenu(menu);
-
-// recupera informações do frontend
-ipcMain.on("set-teste", (event, data) => {
-  console.log(data);
-});
 
 // recupera impressoras
 function getPrinters(command) {
@@ -78,6 +82,7 @@ async function getFolder() {
   });
 
   if (dialogFolder.canceled) {
+    window.webContents.send("notShow/dialog");
     return false;
   }
 
@@ -89,12 +94,3 @@ async function getFolder() {
   data.fileName = fileName;
   window.webContents.send("set/fileName", fileName);
 }
-
-// comandos dos botões da janela
-ipcMain.on("app/minimize", () => {
-  window.minimize();
-});
-
-ipcMain.on("app/close", () => {
-  app.quit();
-});
