@@ -94,3 +94,9 @@ async function getFolder() {
   data.fileName = fileName;
   window.webContents.send("set/fileName", fileName);
 }
+
+// TODO: ler arquivo Excel e pegar os códigos da coluna "A"
+// TODO: achar todos os arquivos dentro das respectivas pastas
+// TODO: adicionar os PDFs na fila de impressão de forma unitária (+desempenho)
+// TODO: imprimir PDFs executando apenas códigos no CMD (Adobe acrobat)
+// TODO: build da aplicação
