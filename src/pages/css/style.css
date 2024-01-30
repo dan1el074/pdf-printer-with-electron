@@ -8,6 +8,7 @@ body {
   font-family: sans-serif;
   background-color: #eee;
   overflow: hidden;
+  user-select: none;
 }
 
 img {
@@ -49,13 +50,13 @@ section .btn {
   padding: 8px 16px;
   border: none;
   border-radius: 3px;
-  background-color: blueviolet;
+  background-color: #1689fc;
   color: #fff;
   cursor: pointer;
 }
 
 section .btn:hover {
-  background-color: rgb(158, 91, 219);
+  background-color: #55a8fc;
   transition: 0.3s;
 }
 
@@ -129,6 +130,15 @@ section.action-page .printer-input {
   outline: 0;
 }
 
+/* /////////// errors /////////// */
+.error {
+  display: none;
+  color: red;
+  font-size: 11px;
+  margin-top: 10px;
+}
+
+/* /////////// keyframes /////////// */
 @keyframes shake {
   0%,
   100% {

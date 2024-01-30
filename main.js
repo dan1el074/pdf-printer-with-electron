@@ -1,20 +1,23 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
+const printer = require("pdf-to-printer");
 const path = require("path");
+const XLSX = require("xlsx");
 
 let window = null;
 let data = {
-  folder: "",
+  path: "",
   fileName: "",
   printers: [],
   printer: "",
+  codes: [],
 };
 
 app.whenReady().then(createWindow);
 
 async function createWindow() {
   window = new BrowserWindow({
-    icon: path.join(__dirname, "/icon.ico"),
+    icon: path.join(__dirname, "/icon-def.ico"),
     width: 500,
     height: 300,
     maxWidth: 500,
@@ -28,7 +31,6 @@ async function createWindow() {
   });
 
   await window.loadFile("./src/pages/index.html");
-  // window.webContents.openDevTools();
   getPrinters("wmic printer get name");
 }
 
@@ -73,32 +75,96 @@ function getPrinters(command) {
 
 // recuperar pasta
 ipcMain.on("action/showDialog", () => {
-  getFolder();
+  getPath();
 });
 
-async function getFolder() {
-  let dialogFolder = await dialog.showOpenDialog({
+async function getPath() {
+  let dialogPath = await dialog.showOpenDialog({
     defaultPath: app.getPath("desktop"),
   });
 
-  if (dialogFolder.canceled) {
+  if (dialogPath.canceled) {
     window.webContents.send("notShow/dialog");
     return false;
   }
 
-  const folder = String(dialogFolder.filePaths).replace("\\\\", "\\");
-  const arrayFolder = folder.split("\\");
+  const folderPath = String(dialogPath.filePaths).replace("\\\\", "\\");
+  const arrayFolder = folderPath.split("\\");
   const fileName = arrayFolder[arrayFolder.length - 1];
 
-  data.folder = folder;
+  if (arrayFolder[1] === "metaro-server") {
+    data.path = "\\" + folderPath;
+  } else {
+    data.path = folderPath;
+  }
+
   data.fileName = fileName;
   window.webContents.send("set/fileName", fileName);
 }
 
-// TODO: ler arquivo Excel e pegar os códigos da coluna "A"
-// TODO: achar todos os arquivos dentro das respectivas pastas
-// TODO: adicionar os PDFs na fila de impressão de forma unitária (+desempenho)
-// TODO: imprimir PDFs executando apenas códigos no CMD (Adobe acrobat?)
-// TODO: criar ícone para aplicação
-// TODO: build da aplicação
-// TODO: criar um load depois do click em "imprimir", até a aplicação terminar de rodar!
+// recupera códigos Excel
+ipcMain.on("action/getCodes", () => {
+  getCodes();
+});
+
+function getCodes() {
+  const workbook = XLSX.readFile(data.path);
+  const firstSheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[firstSheetName];
+  const resExcel = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const regex = /\d+-?\d+-?(DET)?\d+/;
+  data.codes = [];
+
+  resExcel.forEach((array) => {
+    let apenasNumeros = String(array[0]).match(regex);
+
+    if (apenasNumeros) {
+      data.codes.push(apenasNumeros.input);
+    }
+  });
+
+  console.log(data.codes);
+}
+
+// run application
+ipcMain.on("app/run", (event, printer) => {
+  data.printer = printer;
+  runApplication();
+});
+
+function runApplication() {
+  const codeFolders = [];
+  const codes = [...data.codes];
+  let startCode = "";
+  const arrayDirPath = data.path.split("\\");
+  let dirPath = arrayDirPath.pop();
+  dirPath = arrayDirPath.join("\\");
+  dirPath = dirPath + "\\";
+
+  codes.forEach((code) => {
+    if (code.includes("-")) {
+      startCode = code.split("-")[0];
+    } else {
+      startCode = code;
+    }
+    const pathFound = startCode.slice(0, -3);
+    const foundFilePath = dirPath + pathFound + "000\\" + code + ".pdf";
+    codeFolders.push(foundFilePath);
+  });
+
+  const nomeImpressora = data.printer;
+  let caminhoPDF = "";
+
+  for (i = 0; i < codeFolders.length; i++) {
+    caminhoPDF = codeFolders[i];
+
+    printer
+      .print(caminhoPDF, { printer: nomeImpressora })
+      .then(() => {
+        console.log("Arquivo impresso com sucesso!");
+      })
+      .catch((erro) => {
+        console.log("Erro: ", erro);
+      });
+  }
+}

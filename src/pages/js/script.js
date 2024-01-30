@@ -1,10 +1,11 @@
-const { ipcRenderer } = require("electron");
+const { ipcRenderer, ipcMain } = require("electron");
 
 const searchBtn = document.getElementById("search-btn");
 const placeholder = document.getElementById("placeholder");
 const newPlaceholder = document.getElementById("new-placeholder");
 const printersSelect = document.getElementById("printers");
 const inputSearch = document.querySelector(".input-search");
+const error = document.getElementById("error");
 let showDialog = false;
 
 // mandando att pro backend
@@ -30,10 +31,11 @@ ipcRenderer.on("set/printers", (event, data) => {
 });
 
 ipcRenderer.on("set/fileName", (event, data) => {
-  placeholder.setAttribute("style", "display:none;");
-  inputSearch.setAttribute("style", "border:2px solid #fff;transition:0.5s");
-  newPlaceholder.setAttribute("style", "display:inline;");
+  placeholder.style.display = "none";
+  inputSearch.style.border = "2px solid #fff";
+  newPlaceholder.style.display = "inline";
   newPlaceholder.innerHTML = data;
+  error.style.display = "none";
   showDialog = false;
 });
 
