@@ -4,16 +4,45 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^28.2.0"
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1"
   },
   "dependencies": {
     "pdf-to-printer": "^5.6.0",
     "xlsx": "^0.18.5"
+  },
+  "build": {
+    "appId": "com.metaro.imprimePDF",
+    "productName": "Imprime PDF",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon-def.ico",
+      "publisherName": "Metaro Indústria e Comércio LTDA"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icon-def.ico",
+      "uninstallerIcon": "icon-def.ico",
+      "installerHeaderIcon": "icon-def.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Imprime PDF"
+    }
   }
 }
