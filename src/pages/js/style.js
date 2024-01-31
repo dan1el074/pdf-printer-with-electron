@@ -41,6 +41,6 @@ printBtn.addEventListener("click", () => {
 });
 
 printBtn.addEventListener("blur", () => {
-  printBtn.style.backgroundColor = "#00E500";
+  printBtn.style.backgroundColor = "#1689fc";
   printBtn.style.transition = "1s";
 });

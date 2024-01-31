@@ -1,9 +1,11 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
+const pdfPrinter = require("pdf-to-printer");
 const path = require("path");
 const XLSX = require("xlsx");
 
 let window = null;
+let running = false;
 let data = {
   path: "",
   fileName: "",
@@ -128,10 +130,13 @@ function getCodes() {
 // run application
 ipcMain.on("app/run", (event, printer) => {
   data.printer = printer;
-  runApplication();
+  if (!running) {
+    runApplication();
+  }
 });
 
 function runApplication() {
+  running = true;
   let codeFolders = [];
   let startCode = "";
   const arrayDirPath = data.path.split("\\");
@@ -156,17 +161,20 @@ function runApplication() {
   });
 
   console.log(codeFolders);
-
   imprime(codeFolders);
+  running = false;
 }
 
-async function imprime(caminhosDeCodigo) {
-  for (const caminhoDeCodigo of caminhosDeCodigo) {
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // Use Promise para introduzir um atraso
-    const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /t "${caminhoDeCodigo}" "${data.printer}"`;
-    exec(comando);
-    console.log(comando);
+async function imprime(codeFolders) {
+  for (const path of codeFolders) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    pdfPrinter
+      .print(path, { printer: data.printer })
+      .then(() => {
+        console.log(`Arquivo PDF impresso com sucesso em: ${data.printer}`);
+      })
+      .catch((error) => {
+        console.error(`Erro ao imprimir: ${error}`);
+      });
   }
 }
-
-// TODO: criar log de impressão
