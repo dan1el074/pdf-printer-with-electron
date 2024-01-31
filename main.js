@@ -1,6 +1,5 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
-const printer = require("pdf-to-printer");
 const path = require("path");
 const XLSX = require("xlsx");
 
@@ -68,7 +67,6 @@ function getPrinters(command) {
     }
 
     data.printers = printers;
-    console.log(printers);
     window.webContents.send("set/printers", printers);
   });
 }
@@ -113,16 +111,17 @@ function getCodes() {
   const worksheet = workbook.Sheets[firstSheetName];
   const resExcel = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
   const regex = /\d+-?\d+-?(DET)?\d+/;
+  let codes = [];
   data.codes = [];
 
   resExcel.forEach((array) => {
-    let apenasNumeros = String(array[0]).match(regex);
-
-    if (apenasNumeros) {
-      data.codes.push(apenasNumeros.input);
+    let apenasCodigos = String(array[0]).match(regex);
+    if (apenasCodigos) {
+      codes.push(apenasCodigos.input);
     }
   });
 
+  data.codes = codes; // .reverse();
   console.log(data.codes);
 }
 
@@ -133,38 +132,41 @@ ipcMain.on("app/run", (event, printer) => {
 });
 
 function runApplication() {
-  const codeFolders = [];
-  const codes = [...data.codes];
+  let codeFolders = [];
   let startCode = "";
   const arrayDirPath = data.path.split("\\");
   let dirPath = arrayDirPath.pop();
   dirPath = arrayDirPath.join("\\");
   dirPath = dirPath + "\\";
 
-  codes.forEach((code) => {
+  data.codes.forEach((code) => {
     if (code.includes("-")) {
       startCode = code.split("-")[0];
     } else {
       startCode = code;
     }
-    const pathFound = startCode.slice(0, -3);
-    const foundFilePath = dirPath + pathFound + "000\\" + code + ".pdf";
+    let pathFound = startCode.slice(0, -3);
+
+    if (pathFound.length == 1) {
+      pathFound = "0" + pathFound;
+    }
+
+    const foundFilePath = `${dirPath}${pathFound}000\\${code}.pdf`;
     codeFolders.push(foundFilePath);
   });
 
-  const nomeImpressora = data.printer;
-  let caminhoPDF = "";
+  console.log(codeFolders);
 
-  for (i = 0; i < codeFolders.length; i++) {
-    caminhoPDF = codeFolders[i];
+  imprime(codeFolders);
+}
 
-    printer
-      .print(caminhoPDF, { printer: nomeImpressora })
-      .then(() => {
-        console.log("Arquivo impresso com sucesso!");
-      })
-      .catch((erro) => {
-        console.log("Erro: ", erro);
-      });
+async function imprime(caminhosDeCodigo) {
+  for (const caminhoDeCodigo of caminhosDeCodigo) {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Use Promise para introduzir um atraso
+    const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /t "${caminhoDeCodigo}" "${data.printer}"`;
+    exec(comando);
+    console.log(comando);
   }
 }
+
+// TODO: criar log de impressão

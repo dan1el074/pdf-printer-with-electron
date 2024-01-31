@@ -34,13 +34,13 @@ previousBtn.addEventListener("click", () => {
 });
 
 printBtn.addEventListener("click", () => {
-  const chosenPrinter = document.getElementById("printers").value;
-  ipcRenderer.send("app/run", chosenPrinter);
   printBtn.style.backgroundColor = "#00E500";
   printBtn.style.transition = "1s";
+  const chosenPrinter = document.getElementById("printers").value;
+  ipcRenderer.send("app/run", chosenPrinter);
 });
 
 printBtn.addEventListener("blur", () => {
-  printBtn.style.backgroundColor = "blueviolet";
+  printBtn.style.backgroundColor = "#00E500";
   printBtn.style.transition = "1s";
 });
