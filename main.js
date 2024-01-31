@@ -123,7 +123,7 @@ function getCodes() {
     }
   });
 
-  data.codes = codes; // .reverse();
+  data.codes = codes;
   console.log(data.codes);
 }
 
@@ -162,12 +162,11 @@ function runApplication() {
 
   console.log(codeFolders);
   imprime(codeFolders);
-  running = false;
 }
 
 async function imprime(codeFolders) {
   for (const path of codeFolders) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     pdfPrinter
       .print(path, { printer: data.printer })
       .then(() => {
@@ -176,5 +175,9 @@ async function imprime(codeFolders) {
       .catch((error) => {
         console.error(`Erro ao imprimir: ${error}`);
       });
+    console.log("imprimido!");
   }
+  console.log("App finalizado!");
+  running = false;
+  app.quit();
 }
