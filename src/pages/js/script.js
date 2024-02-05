@@ -42,3 +42,11 @@ ipcRenderer.on("set/fileName", (event, data) => {
 ipcRenderer.on("notShow/dialog", () => {
   showDialog = false;
 });
+
+ipcRenderer.on("message", (event, data) => {
+  console.log(data);
+});
+
+ipcRenderer.on("message/erro", (event, data) => {
+  console.log(data);
+});

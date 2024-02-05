@@ -8,7 +8,7 @@
   width: 100%;
   top: 0px;
   right: 0;
-  z-index: 1;
+  z-index: 9;
 }
 
 .chrome-bar .descriptions {

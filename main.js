@@ -1,6 +1,8 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
+const { PDFDocument, degrees } = require("pdf-lib");
 const pdfPrinter = require("pdf-to-printer");
+const fs = require("fs/promises");
 const path = require("path");
 const XLSX = require("xlsx");
 
@@ -12,6 +14,8 @@ let data = {
   printers: [],
   printer: "",
   codes: [],
+  temporaryFile: "temp/arquivoResultado.pdf",
+  // temporaryFile: "resources/app/temp/arquivoResultado.pdf",
 };
 
 app.whenReady().then(createWindow);
@@ -32,6 +36,7 @@ async function createWindow() {
   });
 
   await window.loadFile("./src/pages/index.html");
+  // window.webContents.openDevTools();
   getPrinters("wmic printer get name");
 }
 
@@ -127,6 +132,71 @@ function getCodes() {
   console.log(data.codes);
 }
 
+// junta os arquivos PDFs
+async function juntarPDFs(caminhosArquivos) {
+  const novoPDF = await PDFDocument.create();
+
+  for (const caminhoArquivo of caminhosArquivos) {
+    const arquivo = await fs.readFile(caminhoArquivo);
+    const pdf = await PDFDocument.load(arquivo);
+    const paginas = await novoPDF.copyPages(pdf, pdf.getPageIndices());
+    paginas.forEach((pagina) => novoPDF.addPage(pagina));
+  }
+
+  const novoPDFBytes = await novoPDF.save();
+  await fs.writeFile(data.temporaryFile, novoPDFBytes);
+}
+
+// organiza arquivo PDF
+async function organizarPDF(inputPath, outputPath) {
+  try {
+    const inputBytes = await fs.readFile(inputPath);
+    const pdfDoc = await PDFDocument.load(inputBytes);
+    // const pageSize = { width: 842, height: 595 };
+    const numPages = pdfDoc.getPageCount();
+
+    // Girar a página para o modo horizontal (paisagem)
+    for (let i = 0; i < numPages; i++) {
+      const page = pdfDoc.getPage(i);
+      const isRetrato = page.getSize().width < page.getSize().height;
+
+      if (isRetrato) {
+        page.setRotation(degrees(90));
+      }
+    }
+
+    // Salvar o PDF modificado
+    const modifiedBytes = await pdfDoc.save();
+    await fs.writeFile(outputPath, modifiedBytes);
+
+    console.log("PDF organizado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao organizar o PDF:", error);
+  }
+}
+
+// imprime arquivo PDF
+function imprime(fileToPrint) {
+  pdfPrinter
+    .print(fileToPrint, { printer: data.printer })
+    .then(() => {
+      console.log(`Arquivo PDF impresso com sucesso em: ${data.printer}`);
+      app.quit();
+    })
+    .catch((error) => {
+      console.error(`Erro ao imprimir: ${error}`);
+    });
+  console.log("imprimido!");
+  running = false;
+}
+
+async function imprimeExec() {
+  await new Promise((resolve) => setTimeout(resolve, 1000)); // Use Promise para introduzir um atraso
+  const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /t "${data.temporaryFile}" "${data.printer}"`;
+  exec(comando);
+  console.log(comando);
+}
+
 // run application
 ipcMain.on("app/run", (event, printer) => {
   data.printer = printer;
@@ -161,23 +231,28 @@ function runApplication() {
   });
 
   console.log(codeFolders);
-  imprime(codeFolders);
-}
-
-async function imprime(codeFolders) {
-  for (const path of codeFolders) {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    pdfPrinter
-      .print(path, { printer: data.printer })
-      .then(() => {
-        console.log(`Arquivo PDF impresso com sucesso em: ${data.printer}`);
-      })
-      .catch((error) => {
-        console.error(`Erro ao imprimir: ${error}`);
-      });
-    console.log("imprimido!");
-  }
-  console.log("App finalizado!");
-  running = false;
-  app.quit();
+  juntarPDFs(codeFolders)
+    .then(() => {
+      console.log("Arquivos PDF combinados com sucesso!");
+      window.webContents.send(
+        "message",
+        "Arquivos PDF combinados com sucesso!"
+      );
+    })
+    .then(() => {
+      organizarPDF(data.temporaryFile, data.temporaryFile);
+    })
+    .then(() => {
+      // imprime(data.temporaryFile);
+      imprimeExec();
+      window.webContents.send("message", "Impressão realizada!");
+      console.log("Impressão realizada!");
+    })
+    .catch((erro) => {
+      console.error("Erro ao combinar ou imprimir arquivos:", erro);
+      window.webContents.send(
+        "message/erro",
+        `Erro ao combinar ou imprimir arquivos: ${erro}`
+      );
+    });
 }
