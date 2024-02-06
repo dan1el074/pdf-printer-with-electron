@@ -1,7 +1,6 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
 const { PDFDocument, degrees } = require("pdf-lib");
-const pdfPrinter = require("pdf-to-printer");
 const fs = require("fs/promises");
 const path = require("path");
 const XLSX = require("xlsx");
@@ -15,14 +14,13 @@ let data = {
   printer: "",
   codes: [],
   temporaryFile: "temp/arquivoResultado.pdf",
-  // temporaryFile: "resources/app/temp/arquivoResultado.pdf",
 };
 
 app.whenReady().then(createWindow);
 
 async function createWindow() {
   window = new BrowserWindow({
-    icon: path.join(__dirname, "/icon-def.ico"),
+    icon: path.join(__dirname, "/icon.ico"),
     width: 500,
     height: 300,
     maxWidth: 500,
@@ -175,9 +173,11 @@ async function organizarPDF(inputPath, outputPath) {
   } catch (error) {
     console.error("Erro ao organizar o PDF:", error);
     setTimeout(() => {
-      window.webContents.send("message/error", `Erro ao organizar o PDF: ${error}`);
-    }, 1000)
-
+      window.webContents.send(
+        "message/error",
+        `Erro ao organizar o PDF: ${error}`
+      );
+    }, 1000);
   }
 }
 
@@ -228,20 +228,26 @@ function runApplication() {
     .then(() => {
       console.log("Arquivos PDF combinados com sucesso!");
       setTimeout(() => {
-        window.webContents.send("message/sucess", "Arquivos PDF combinados com sucesso!");
-      }, 500)
+        window.webContents.send(
+          "message/sucess",
+          "Arquivos PDF combinados com sucesso!"
+        );
+      }, 500);
     })
     .then(() => {
       imprimeExec();
       console.log("Impressão realizada!");
       setTimeout(() => {
         window.webContents.send("message/sucess", "Impressão realizada!");
-      }, 1000)
+      }, 1000);
     })
     .catch((erro) => {
       console.error("Erro ao combinar ou imprimir arquivos:", erro);
       setTimeout(() => {
-        window.webContents.send("message/error", `Erro ao combinar ou imprimir arquivos!`);
-      }, 500)
+        window.webContents.send(
+          "message/error",
+          `Erro ao combinar ou imprimir arquivos!`
+        );
+      }, 500);
     });
 }
