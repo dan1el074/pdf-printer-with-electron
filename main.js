@@ -130,6 +130,7 @@ function getCodes() {
 
   data.codes = codes;
   console.log(data.codes);
+  running = false;
 }
 
 // junta os arquivos PDFs
@@ -145,6 +146,7 @@ async function juntarPDFs(caminhosArquivos) {
 
   const novoPDFBytes = await novoPDF.save();
   await fs.writeFile(data.temporaryFile, novoPDFBytes);
+  await organizarPDF(data.temporaryFile, data.temporaryFile);
 }
 
 // organiza arquivo PDF
@@ -158,7 +160,7 @@ async function organizarPDF(inputPath, outputPath) {
     // Girar a página para o modo horizontal (paisagem)
     for (let i = 0; i < numPages; i++) {
       const page = pdfDoc.getPage(i);
-      const isRetrato = page.getSize().width < page.getSize().height;
+      const isRetrato = page.getSize().width > page.getSize().height;
 
       if (isRetrato) {
         page.setRotation(degrees(90));
@@ -172,24 +174,14 @@ async function organizarPDF(inputPath, outputPath) {
     console.log("PDF organizado com sucesso!");
   } catch (error) {
     console.error("Erro ao organizar o PDF:", error);
+    setTimeout(() => {
+      window.webContents.send("message/error", `Erro ao organizar o PDF: ${error}`);
+    }, 1000)
+
   }
 }
 
 // imprime arquivo PDF
-function imprime(fileToPrint) {
-  pdfPrinter
-    .print(fileToPrint, { printer: data.printer })
-    .then(() => {
-      console.log(`Arquivo PDF impresso com sucesso em: ${data.printer}`);
-      app.quit();
-    })
-    .catch((error) => {
-      console.error(`Erro ao imprimir: ${error}`);
-    });
-  console.log("imprimido!");
-  running = false;
-}
-
 async function imprimeExec() {
   await new Promise((resolve) => setTimeout(resolve, 1000)); // Use Promise para introduzir um atraso
   const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /t "${data.temporaryFile}" "${data.printer}"`;
@@ -213,6 +205,7 @@ function runApplication() {
   let dirPath = arrayDirPath.pop();
   dirPath = arrayDirPath.join("\\");
   dirPath = dirPath + "\\";
+  window.webContents.send("message/notice", "Processando arquivos");
 
   data.codes.forEach((code) => {
     if (code.includes("-")) {
@@ -234,25 +227,21 @@ function runApplication() {
   juntarPDFs(codeFolders)
     .then(() => {
       console.log("Arquivos PDF combinados com sucesso!");
-      window.webContents.send(
-        "message",
-        "Arquivos PDF combinados com sucesso!"
-      );
+      setTimeout(() => {
+        window.webContents.send("message/sucess", "Arquivos PDF combinados com sucesso!");
+      }, 500)
     })
     .then(() => {
-      organizarPDF(data.temporaryFile, data.temporaryFile);
-    })
-    .then(() => {
-      // imprime(data.temporaryFile);
       imprimeExec();
-      window.webContents.send("message", "Impressão realizada!");
       console.log("Impressão realizada!");
+      setTimeout(() => {
+        window.webContents.send("message/sucess", "Impressão realizada!");
+      }, 1000)
     })
     .catch((erro) => {
       console.error("Erro ao combinar ou imprimir arquivos:", erro);
-      window.webContents.send(
-        "message/erro",
-        `Erro ao combinar ou imprimir arquivos: ${erro}`
-      );
+      setTimeout(() => {
+        window.webContents.send("message/error", `Erro ao combinar ou imprimir arquivos!`);
+      }, 500)
     });
 }

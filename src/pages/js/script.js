@@ -5,7 +5,8 @@ const placeholder = document.getElementById("placeholder");
 const newPlaceholder = document.getElementById("new-placeholder");
 const printersSelect = document.getElementById("printers");
 const inputSearch = document.querySelector(".input-search");
-const error = document.getElementById("error");
+const alertContainer = document.querySelector('.alert-container');
+let contadorAlert = 0;
 let showDialog = false;
 
 // mandando att pro backend
@@ -43,10 +44,47 @@ ipcRenderer.on("notShow/dialog", () => {
   showDialog = false;
 });
 
-ipcRenderer.on("message", (event, data) => {
-  console.log(data);
+ipcRenderer.on("message/notice", (event, data) => {
+  const contador = contadorAlert + 1;
+  let div = document.createElement('div');
+  div.setAttribute('id', `alert${contador}`);
+  div.classList.add('alert');
+  div.classList.add('notice');
+  div.innerHTML = `<span>${data}</span>`
+  
+  alertContainer.appendChild(div)
+
+  setTimeout(() => {
+  document.getElementById(`alert${contador}`).remove()
+  },5000)
 });
 
-ipcRenderer.on("message/erro", (event, data) => {
-  console.log(data);
+ipcRenderer.on("message/sucess", (event, data) => {
+  const contador = contadorAlert + 1;
+  let div = document.createElement('div');
+  div.setAttribute('id', `alert${contador}`);
+  div.classList.add('alert');
+  div.classList.add('sucess');
+  div.innerHTML = `<span>${data}</span>`
+  
+  alertContainer.appendChild(div)
+
+  setTimeout(() => {
+  document.getElementById(`alert${contador}`).remove()
+  },5000)
+});
+
+ipcRenderer.on("message/error", (event, data) => {
+  const contador = contadorAlert + 1;
+  let div = document.createElement('div');
+  div.setAttribute('id', `alert${contador}`);
+  div.classList.add('alert');
+  div.classList.add('error');
+  div.innerHTML = `<span>${data}</span>`
+  
+  alertContainer.appendChild(div)
+
+  setTimeout(() => {
+  document.getElementById(`alert${contador}`).remove()
+  },5000)
 });
