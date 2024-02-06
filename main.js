@@ -23,9 +23,9 @@ async function createWindow() {
     icon: path.join(__dirname, "/icon.ico"),
     width: 500,
     height: 300,
-    maxWidth: 500,
-    maxHeight: 300,
-    resizable: false,
+    // maxWidth: 500,
+    // maxHeight: 300,
+    // resizable: false,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
@@ -152,10 +152,8 @@ async function organizarPDF(inputPath, outputPath) {
   try {
     const inputBytes = await fs.readFile(inputPath);
     const pdfDoc = await PDFDocument.load(inputBytes);
-    // const pageSize = { width: 842, height: 595 };
     const numPages = pdfDoc.getPageCount();
 
-    // Girar a página para o modo horizontal (paisagem)
     for (let i = 0; i < numPages; i++) {
       const page = pdfDoc.getPage(i);
       const isRetrato = page.getSize().width > page.getSize().height;
@@ -165,7 +163,6 @@ async function organizarPDF(inputPath, outputPath) {
       }
     }
 
-    // Salvar o PDF modificado
     const modifiedBytes = await pdfDoc.save();
     await fs.writeFile(outputPath, modifiedBytes);
 
@@ -185,7 +182,15 @@ async function organizarPDF(inputPath, outputPath) {
 async function imprimeExec() {
   await new Promise((resolve) => setTimeout(resolve, 1000)); // Use Promise para introduzir um atraso
   const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /t "${data.temporaryFile}" "${data.printer}"`;
-  exec(comando);
+  exec(comando, (erro, stdout, stderr) => {
+    if (erro) {
+      console.error(`Erro ao imprimir o arquivo: ${erro}`);
+      window.webContents.send("message/error", `Erro ao imprimir: ${erro}`);
+      return;
+    }
+    console.log(`Arquivo impresso com sucesso: ${caminhoArquivoPDF}`);
+    window.webContents.send("message/sucess", "Arquivo impresso com sucesso!");
+  });
   console.log(comando);
 }
 
@@ -235,11 +240,10 @@ function runApplication() {
       }, 500);
     })
     .then(() => {
-      imprimeExec();
-      console.log("Impressão realizada!");
       setTimeout(() => {
-        window.webContents.send("message/sucess", "Impressão realizada!");
+        window.webContents.send("message/notice", "Imprimindo...");
       }, 1000);
+      imprimeExec();
     })
     .catch((erro) => {
       console.error("Erro ao combinar ou imprimir arquivos:", erro);
