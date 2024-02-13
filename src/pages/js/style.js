@@ -31,6 +31,7 @@ nextBtn.addEventListener("click", () => {
 previousBtn.addEventListener("click", () => {
   actionPage.style.transform = "translateX(100%)";
   actionPage.style.transition = "0.5s";
+  alertContainer.innerHTML = "";
 });
 
 printBtn.addEventListener("click", () => {

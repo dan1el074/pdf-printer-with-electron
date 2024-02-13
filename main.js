@@ -131,7 +131,7 @@ function getCodes() {
   });
 
   data.codes = codes;
-  console.log(data.codes);
+  // console.log(data.codes);
 
   if (data.codes.length <= 0) {
     setTimeout(() => {
@@ -180,9 +180,9 @@ async function organizarPDF(inputPath, outputPath) {
     const modifiedBytes = await pdfDoc.save();
     await fs.writeFile(outputPath, modifiedBytes);
 
-    console.log("PDF organizado com sucesso!");
+    // console.log("PDF organizado com sucesso!");
   } catch (error) {
-    console.error("Erro ao organizar o PDF:", error);
+    // console.error("Erro ao organizar o PDF:", error);
     setTimeout(() => {
       window.webContents.send(
         "message/error",
@@ -197,13 +197,13 @@ async function imprimeExec() {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /s /h /t "${data.temporaryFile}" "${data.printer}"`;
   exec(comando);
-  console.log(comando);
+  // console.log(comando);
 
   setTimeout(() => {
     exec(
       'taskkill /F /IM "C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe"'
     );
-    console.log("Arquivo impresso com sucesso");
+    // console.log("Arquivo impresso com sucesso");
     window.webContents.send("message/sucess", "Arquivo impresso com sucesso!");
   }, 5000);
 }
@@ -242,10 +242,10 @@ function runApplication() {
     codeFolders.push(foundFilePath);
   });
 
-  console.log(codeFolders);
+  // console.log(codeFolders);
   juntarPDFs(codeFolders)
     .then(() => {
-      console.log("Arquivos PDF combinados com sucesso!");
+      // console.log("Arquivos PDF combinados com sucesso!");
       setTimeout(() => {
         window.webContents.send(
           "message/sucess",
@@ -260,12 +260,19 @@ function runApplication() {
       imprimeExec();
     })
     .catch((erro) => {
-      console.error("Erro ao combinar ou imprimir arquivos:", erro);
+      // console.error("Erro ao combinar ou imprimir arquivos:", erro);
       setTimeout(() => {
-        window.webContents.send(
-          "message/error",
-          `Erro ao combinar ou imprimir arquivos!`
-        );
+        if (erro.path) {
+          window.webContents.send(
+            "message/error",
+            `Erro! Arquivo não encontrado: ${erro.path}`
+          );
+        } else {
+          window.webContents.send(
+            "message/error",
+            "Erro ao combinar ou imprimir arquivos!"
+          );
+        }
       }, 500);
     });
 }
