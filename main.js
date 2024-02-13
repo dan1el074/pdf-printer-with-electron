@@ -13,7 +13,7 @@ let data = {
   printers: [],
   printer: "",
   codes: [],
-  temporaryFile: "temp/arquivoResultado.pdf",
+  temporaryFile: "temp/result.pdf",
 };
 
 app.whenReady().then(createWindow);
@@ -23,9 +23,9 @@ async function createWindow() {
     icon: path.join(__dirname, "/icon.ico"),
     width: 500,
     height: 300,
-    // maxWidth: 500,
-    // maxHeight: 300,
-    // resizable: false,
+    maxWidth: 500,
+    maxHeight: 300,
+    resizable: false,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
@@ -34,8 +34,7 @@ async function createWindow() {
   });
 
   await window.loadFile("./src/pages/index.html");
-  // window.webContents.openDevTools();
-  getPrinters("wmic printer get name");
+  getPrinters();
 }
 
 // comandos dos botões da janela
@@ -53,9 +52,14 @@ const menu = new Menu.buildFromTemplate(menuTemplate);
 Menu.setApplicationMenu(menu);
 
 // recupera impressoras
-function getPrinters(command) {
+function getPrinters() {
+  const command = "wmic printer get name";
   exec(command, (error, stdout, stderr) => {
     if (error || stderr) {
+      window.webContents.send(
+        "message/error",
+        "Erro: nenhuma impressora encontrada!"
+      );
       return;
     }
 
@@ -128,6 +132,16 @@ function getCodes() {
 
   data.codes = codes;
   console.log(data.codes);
+
+  if (data.codes.length <= 0) {
+    setTimeout(() => {
+      window.webContents.send(
+        "message/simpleError",
+        "Erro: nenhum código encontrado!"
+      );
+    }, 500);
+  }
+
   running = false;
 }
 
@@ -180,18 +194,18 @@ async function organizarPDF(inputPath, outputPath) {
 
 // imprime arquivo PDF
 async function imprimeExec() {
-  await new Promise((resolve) => setTimeout(resolve, 1000)); // Use Promise para introduzir um atraso
-  const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /t "${data.temporaryFile}" "${data.printer}"`;
-  exec(comando, (erro, stdout, stderr) => {
-    if (erro) {
-      console.error(`Erro ao imprimir o arquivo: ${erro}`);
-      window.webContents.send("message/error", `Erro ao imprimir: ${erro}`);
-      return;
-    }
-    console.log(`Arquivo impresso com sucesso: ${caminhoArquivoPDF}`);
-    window.webContents.send("message/sucess", "Arquivo impresso com sucesso!");
-  });
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /s /h /t "${data.temporaryFile}" "${data.printer}"`;
+  exec(comando);
   console.log(comando);
+
+  setTimeout(() => {
+    exec(
+      'taskkill /F /IM "C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe"'
+    );
+    console.log("Arquivo impresso com sucesso");
+    window.webContents.send("message/sucess", "Arquivo impresso com sucesso!");
+  }, 5000);
 }
 
 // run application

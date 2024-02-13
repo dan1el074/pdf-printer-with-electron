@@ -130,14 +130,6 @@ section.action-page .printer-input {
   outline: 0;
 }
 
-/* /////////// errors /////////// */
-.error {
-  display: none;
-  color: red;
-  font-size: 11px;
-  margin-top: 10px;
-}
-
 /* /////////// keyframes /////////// */
 @keyframes shake {
   0%,

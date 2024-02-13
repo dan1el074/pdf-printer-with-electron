@@ -84,3 +84,18 @@ ipcRenderer.on("message/error", (event, data) => {
 
   alertContainer.appendChild(div);
 });
+
+ipcRenderer.on("message/simpleError", (event, data) => {
+  const contador = contadorAlert + 1;
+  let div = document.createElement("div");
+  div.setAttribute("id", `alert${contador}`);
+  div.classList.add("alert");
+  div.classList.add("simple-erro");
+  div.innerHTML = `<span>${data}</span>`;
+
+  alertContainer.appendChild(div);
+
+  setTimeout(() => {
+    document.getElementById(`alert${contador}`).remove();
+  }, 5000);
+});
