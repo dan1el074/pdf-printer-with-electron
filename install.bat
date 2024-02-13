@@ -57,4 +57,4 @@ echo.
 goto fim
 :fim
 
-timeout 10
+timeout 1

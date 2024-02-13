@@ -182,7 +182,7 @@ async function organizarPDF(inputPath, outputPath) {
 
     // console.log("PDF organizado com sucesso!");
   } catch (error) {
-    // console.error("Erro ao organizar o PDF:", error);
+    // console.log("Erro ao organizar o PDF:", error);
     setTimeout(() => {
       window.webContents.send(
         "message/error",
@@ -260,7 +260,7 @@ function runApplication() {
       imprimeExec();
     })
     .catch((erro) => {
-      // console.error("Erro ao combinar ou imprimir arquivos:", erro);
+      // console.log("Erro ao combinar ou imprimir arquivos:", erro);
       setTimeout(() => {
         if (erro.path) {
           window.webContents.send(
