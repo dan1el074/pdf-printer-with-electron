@@ -5,14 +5,13 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package-win": "electron-packager . ImprimePDF-v4.01 --platform=win32 --arch=x64 --out=dist --overwrite --icon=icon-def.ico"
+    "package-win": "electron-packager . ImprimePDF-v4.01 --platform=win32 --arch=x64 --out=dist --overwrite --icon=src/images/icon.ico"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^28.2.0",
-    "electron-packager": "^17.1.2"
+    "electron": "^28.2.0"
   },
   "dependencies": {
     "pdf-lib": "^1.17.1",

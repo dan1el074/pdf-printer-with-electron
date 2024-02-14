@@ -20,7 +20,7 @@ app.whenReady().then(createWindow);
 
 async function createWindow() {
   window = new BrowserWindow({
-    icon: path.join(__dirname, "/icon.ico"),
+    icon: path.join(__dirname, "/src/images/icon.ico"),
     width: 500,
     height: 300,
     maxWidth: 500,
