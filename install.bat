@@ -67,7 +67,7 @@ echo.
     :SIM
     echo O usuario pressionou [S]
     echo.
-    npm install
+    npm install && start explorer C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
     goto fim3
     :NAO
     echo O usuario pressionou [N]
