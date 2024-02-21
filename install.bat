@@ -48,7 +48,7 @@ echo.
 goto fim
 :fim
 
-choice /C SN /M "Copiar Aplicativo para C:\Program Files\ImprimePDF?
+choice /C SN /M "Copiar Aplicativo para a pasta AppData?"
 IF errorlevel=2 goto NAO
 IF errorlevel=1 goto SIM
 :SIM
@@ -58,7 +58,7 @@ rmdir /s /q "C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF"
 cd ..
 Xcopy /E /I %CD%\resource C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
 cd C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
-copy %CD%\ImprimePDF.lnk \\metaro-server\UsuariosAD\%USERNAME%\Desktop
+rmdir /s /q bin
 echo.
 
     choice /C SN /M "Instalar Dependencias?

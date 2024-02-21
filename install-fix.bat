@@ -48,7 +48,7 @@ echo.
 goto fim
 :fim
 
-choice /C SN /M "Copiar Aplicativo para C:\Program Files\ImprimePDF?"
+choice /C SN /M "Copiar o aplicativo para a pasta AppData?"
 IF errorlevel=2 goto NAO
 IF errorlevel=1 goto SIM
 :SIM
