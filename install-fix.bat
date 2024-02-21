@@ -58,6 +58,8 @@ rmdir /s /q "C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF"
 cd ..
 Xcopy /E /I \\metaro-server\UsuariosAD\%USERNAME%\Desktop\ImprimePDF\resource C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
 cd C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
+rmdir /s /q bin
+rmdir /s /q example
 echo.
 
     choice /C SN /M "Instalar Dependencias?
@@ -78,7 +80,6 @@ goto fim2
 :NAO
 echo O usuario pressionou [N]
 echo.
-attrib +s +h ImprimePDF.lnk
 
     choice /C SN /M "Instalar Dependencias?
     IF errorlevel=2 goto NAO
