@@ -8,7 +8,11 @@ body {
   font-family: sans-serif;
   background-color: #eee;
   overflow: hidden;
-  user-select: none;
+}
+
+header,
+section {
+  user-select: none !important;
 }
 
 img {

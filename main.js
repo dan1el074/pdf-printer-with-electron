@@ -13,7 +13,7 @@ let data = {
   printers: [],
   printer: "",
   codes: [],
-  temporaryFile: "temp/result.pdf",
+  temporaryFile: "resources/app/temp/result.pdf",
 };
 
 app.whenReady().then(createWindow);
@@ -32,7 +32,6 @@ async function createWindow() {
       contextIsolation: false,
     },
   });
-
   await window.loadFile("./src/pages/index.html");
   getPrinters();
 }
