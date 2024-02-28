@@ -59,44 +59,17 @@ cd ..
 Xcopy /E /I %CD%\resource C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
 cd C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
 rmdir /s /q bin
-rmdir /s /q example
+start explorer C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
 echo.
-
-    choice /C SN /M "Instalar Dependencias?
-    IF errorlevel=2 goto NAO
-    IF errorlevel=1 goto SIM
-    :SIM
-    echo O usuario pressionou [S]
-    echo.
-    npm install && start explorer C:\Users\%USERNAME%\AppData\Roaming\ImprimePDF
-    goto fim3
-    :NAO
-    echo O usuario pressionou [N]
-    echo.
-    goto fim3
-    :fim3
-
-goto fim2
+goto fim
 :NAO
 echo O usuario pressionou [N]
+rmdir /s /q bin
+cd ..
+ren resource ImprimePDF
 echo.
-
-    choice /C SN /M "Instalar Dependencias?
-    IF errorlevel=2 goto NAO
-    IF errorlevel=1 goto SIM
-    :SIM
-    echo O usuario pressionou [S]
-    echo.
-    npm install
-    goto fim3
-    :NAO
-    echo O usuario pressionou [N]
-    echo.
-    goto fim3
-    :fim3
-
-goto fim2
-:fim2
+goto fim
+:fim
 
 timeout 2
 exit

@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-packager . ImprimePDF-v4.01 --platform=win32 --arch=ia32 --out=dist --overwrite --icon=src/images/icon.ico"
+    "build": "electron-packager . ImprimePDF --platform=win32 --arch=x64 --out=dist --overwrite --icon=src/images/icon.ico"
   },
   "keywords": [],
   "author": "",

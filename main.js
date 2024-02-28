@@ -32,6 +32,7 @@ async function createWindow() {
       contextIsolation: false,
     },
   });
+  // window.webContents.openDevTools();
   await window.loadFile("./src/pages/index.html");
   getPrinters();
 }
