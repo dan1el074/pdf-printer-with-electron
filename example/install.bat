@@ -41,6 +41,8 @@ IF errorlevel=1 goto SIM
 echo O usuario pressionou [S]
 start bin/AdbeRdr920_pt_BR.exe
 echo.
+echo Nao se esqueca de iniciar o Adobe pela primeira vez antes de testar o aplicativo!
+echo.
 goto fim
 :NAO
 echo O usuario pressionou [N]
@@ -64,9 +66,6 @@ echo.
 goto fim
 :NAO
 echo O usuario pressionou [N]
-rmdir /s /q bin
-cd ..
-ren resource ImprimePDF
 echo.
 goto fim
 :fim
