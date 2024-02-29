@@ -23,15 +23,16 @@ async function createWindow() {
     icon: path.join(__dirname, "/src/images/icon.ico"),
     width: 500,
     height: 300,
-    maxWidth: 500,
-    maxHeight: 300,
-    resizable: false,
+    // maxWidth: 500,
+    // maxHeight: 300,
+    // resizable: false,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     },
   });
+  window.webContents.openDevTools();
   await window.loadFile("./src/pages/index.html");
   getPrinters();
 }
