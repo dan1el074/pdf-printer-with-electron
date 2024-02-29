@@ -134,6 +134,12 @@ section.action-page .printer-input {
   outline: 0;
 }
 
+.error {
+  display: block;
+  color: red;
+  margin-top: 6px;
+}
+
 /* /////////// keyframes /////////// */
 @keyframes shake {
   0%,

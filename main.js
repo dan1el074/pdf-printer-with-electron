@@ -32,7 +32,6 @@ async function createWindow() {
       contextIsolation: false,
     },
   });
-  // window.webContents.openDevTools();
   await window.loadFile("./src/pages/index.html");
   getPrinters();
 }
@@ -131,7 +130,6 @@ function getCodes() {
   });
 
   data.codes = codes;
-  // console.log(data.codes);
 
   if (data.codes.length <= 0) {
     setTimeout(() => {
@@ -146,17 +144,17 @@ function getCodes() {
 }
 
 // junta os arquivos PDFs
-async function juntarPDFs(caminhosArquivos) {
-  const novoPDF = await PDFDocument.create();
+async function joinPDF(arrayFilesPath) {
+  const newPDF = await PDFDocument.create();
 
-  for (const caminhoArquivo of caminhosArquivos) {
-    const arquivo = await fs.readFile(caminhoArquivo);
-    const pdf = await PDFDocument.load(arquivo);
-    const paginas = await novoPDF.copyPages(pdf, pdf.getPageIndices());
-    paginas.forEach((pagina) => novoPDF.addPage(pagina));
+  for (const caminhoArquivo of arrayFilesPath) {
+    const PDFFile = await fs.readFile(caminhoArquivo);
+    const pdf = await PDFDocument.load(PDFFile);
+    const pages = await newPDF.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach((page) => newPDF.addPage(page));
   }
 
-  const novoPDFBytes = await novoPDF.save();
+  const novoPDFBytes = await newPDF.save();
   await fs.writeFile(data.temporaryFile, novoPDFBytes);
   await organizarPDF(data.temporaryFile, data.temporaryFile);
 }
@@ -179,10 +177,7 @@ async function organizarPDF(inputPath, outputPath) {
 
     const modifiedBytes = await pdfDoc.save();
     await fs.writeFile(outputPath, modifiedBytes);
-
-    // console.log("PDF organizado com sucesso!");
   } catch (error) {
-    // console.log("Erro ao organizar o PDF:", error);
     setTimeout(() => {
       window.webContents.send(
         "message/error",
@@ -197,13 +192,11 @@ async function imprimeExec() {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /s /h /t "${data.temporaryFile}" "${data.printer}"`;
   exec(comando);
-  // console.log(comando);
 
   setTimeout(() => {
     exec(
       'taskkill /F /IM "C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe"'
     );
-    // console.log("Arquivo impresso com sucesso");
     window.webContents.send("message/sucess", "Arquivo impresso com sucesso!");
   }, 5000);
 }
@@ -212,6 +205,16 @@ async function imprimeExec() {
 ipcMain.on("app/run", (event, printer) => {
   data.printer = printer;
   if (!running) {
+    if (data.codes.length <= 0) {
+      setTimeout(() => {
+        window.webContents.send(
+          "message/simpleError",
+          "Erro: nenhum código foi encontrado!"
+        );
+      }, 500);
+
+      return;
+    }
     runApplication();
   }
 });
@@ -242,10 +245,8 @@ function runApplication() {
     codeFolders.push(foundFilePath);
   });
 
-  // console.log(codeFolders);
-  juntarPDFs(codeFolders)
+  joinPDF(codeFolders)
     .then(() => {
-      // console.log("Arquivos PDF combinados com sucesso!");
       setTimeout(() => {
         window.webContents.send(
           "message/sucess",
@@ -260,7 +261,6 @@ function runApplication() {
       imprimeExec();
     })
     .catch((erro) => {
-      // console.log("Erro ao combinar ou imprimir arquivos:", erro);
       setTimeout(() => {
         if (erro.path) {
           window.webContents.send(
