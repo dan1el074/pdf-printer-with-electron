@@ -190,7 +190,8 @@ async function organizarPDF(inputPath, outputPath) {
 // imprime arquivo PDF
 async function imprimeExec() {
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /s /h /t "${data.temporaryFile}" "${data.printer}"`;
+  // const comando = `"C:\\Program Files (x86)\\Adobe\\Reader 9.0\\Reader\\AcroRd32.exe" /n /s /h /t "${data.temporaryFile}" "${data.printer}"`;
+  const comando = `"C:\\Program Files\\Adobe\\Acrobat DC\\Acrobat\\Acrobat.exe" /n /s /h /t "${data.temporaryFile}" "${data.printer}"`;
   exec(comando);
 
   setTimeout(() => {

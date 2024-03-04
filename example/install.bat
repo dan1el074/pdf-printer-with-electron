@@ -34,12 +34,12 @@ echo.
 goto fim
 :fim
 
-choice /C SN /M "Instalar Adobe Reader 9?
+choice /C SN /M "Instalar Adobe Reader?
 IF errorlevel=2 goto NAO
 IF errorlevel=1 goto SIM
 :SIM
 echo O usuario pressionou [S]
-start bin/AdbeRdr920_pt_BR.exe
+start bin/reader_br_install.exe
 echo.
 echo Nao se esqueca de iniciar o Adobe pela primeira vez antes de testar o aplicativo!
 echo.
